@@ -1,5 +1,5 @@
 import { NavLink, Outlet } from "react-router-dom"
-import { LayoutDashboard, Leaf, Settings } from "lucide-react"
+import { LayoutDashboard, Leaf } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 const navItems = [
