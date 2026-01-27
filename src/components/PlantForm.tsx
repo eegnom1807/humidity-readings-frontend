@@ -9,13 +9,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import type { Plant } from "@/types/plant"
+import type { Plant, PlantRequest } from "@/types/plant"
 
 interface PlantFormProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   plant?: Plant | null
-  onSubmit?: (plant: Partial<Plant>) => void
+  onSubmit?: (data: PlantRequest, edit: boolean) => void
 }
 
 export function PlantForm({ open, onOpenChange, plant, onSubmit }: PlantFormProps) {
@@ -24,11 +24,14 @@ export function PlantForm({ open, onOpenChange, plant, onSubmit }: PlantFormProp
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     const formData = new FormData(e.currentTarget)
-    const data = {
+    const data: PlantRequest = {
       name: formData.get("name") as string,
-      imageUrl: formData.get("imageUrl") as string,
+      species: formData.get("species") as string,
     }
-    onSubmit?.(data)
+    if (isEditing && plant) {
+      data.id = plant.id
+    }
+    onSubmit?.(data, isEditing)
   }
 
   return (
@@ -36,7 +39,7 @@ export function PlantForm({ open, onOpenChange, plant, onSubmit }: PlantFormProp
       <DialogContent className="sm:max-w-106.25">
         <DialogHeader>
           <DialogTitle>
-            {isEditing ? "Editar Planta" : "Nueva Planta"}
+            {isEditing ? "Editar Planta" : "Agregar Planta"}
           </DialogTitle>
           <DialogDescription>
             {isEditing
@@ -51,25 +54,25 @@ export function PlantForm({ open, onOpenChange, plant, onSubmit }: PlantFormProp
               <Input
                 id="name"
                 name="name"
-                placeholder="Ej: Monstera Deliciosa"
+                placeholder="Ej: Planta de tomate"
                 defaultValue={plant?.name ?? ""}
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="imageUrl">URL de imagen</Label>
+              <Label htmlFor="species">Especie</Label>
               <Input
-                id="imageUrl"
-                name="imageUrl"
-                placeholder="https://ejemplo.com/imagen.jpg"
-                defaultValue={plant?.imageUrl ?? ""}
+                id="species"
+                name="species"
+                placeholder="Tomate"
+                defaultValue={plant?.species ?? ""}
               />
             </div>
           </div>
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+            <Button className="cursor-pointer" type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Cancelar
             </Button>
-            <Button type="submit">
+            <Button className="cursor-pointer" type="submit">
               {isEditing ? "Guardar Cambios" : "Crear Planta"}
             </Button>
           </DialogFooter>
