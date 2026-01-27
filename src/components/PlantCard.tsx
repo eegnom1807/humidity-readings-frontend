@@ -39,11 +39,11 @@ export function PlantCard({ plant, onWater, onAutoWaterChange }: PlantCardProps)
         </div>
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <CalendarDays className="h-4 w-4" />
-          <span>Ultima lectura: {plant.lastReadingDate}</span>
+          <span>Última lectura: {plant.lastReadingDate}</span>
         </div>
         <div className="flex items-center justify-between">
           <Label htmlFor={`auto-water-${plant.id}`} className="text-sm">
-            Riego automatico
+            Riego automático
           </Label>
           <Switch
             id={`auto-water-${plant.id}`}

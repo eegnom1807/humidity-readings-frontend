@@ -47,13 +47,14 @@ export function Dashboard() {
         <h1 className="text-3xl font-bold">Estado de Plantas</h1>
       </div>
 
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <div className="grid grid-cols-1 justify-items-center gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {mockPlants.map((plant) => (
-          <PlantCard
-            key={plant.id}
-            plant={plant}
-            onWater={handleWater}
-          />
+          <div key={plant.id} className="w-full max-w-70">
+            <PlantCard
+              plant={plant}
+              onWater={handleWater}
+            />
+          </div>
         ))}
       </div>
 

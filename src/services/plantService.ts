@@ -1,15 +1,5 @@
 import api from "./api"
-import type { Plant } from "@/types/plant"
-
-export interface CreatePlantDto {
-  name: string
-  imageUrl: string
-}
-
-export interface UpdatePlantDto {
-  name?: string
-  imageUrl?: string
-}
+import type { Plant, PlantRequest } from "@/types/plant"
 
 export interface WaterPlantDto {
   plantId: string
@@ -21,31 +11,31 @@ export interface SetAutoWaterDto {
 }
 
 export const plantService = {
-  // Obtener todas las plantas
+  // Get all plants
   getAll: async (): Promise<Plant[]> => {
-    const response = await api.get<Plant[]>("/plants")
-    return response.data
+    const response = await api.get<Plant[]>("/plants");
+    return response.data;
   },
 
-  // Obtener una planta por ID
-  getById: async (id: string): Promise<Plant> => {
-    const response = await api.get<Plant>(`/plants/${id}`)
-    return response.data
-  },
+  // Get plant by id
+  // getById: async (id: string): Promise<Plant> => {
+  //   const response = await api.get<Plant>(`/plants/${id}`)
+  //   return response.data
+  // },
 
-  // Crear una nueva planta
-  create: async (data: CreatePlantDto): Promise<Plant> => {
+  // Create plant
+  create: async (data: PlantRequest): Promise<Plant> => {
     const response = await api.post<Plant>("/plants", data)
     return response.data
   },
 
-  // Actualizar una planta
-  update: async (id: string, data: UpdatePlantDto): Promise<Plant> => {
+  // Update plant
+  update: async (id: string, data: PlantRequest): Promise<Plant> => {
     const response = await api.put<Plant>(`/plants/${id}`, data)
     return response.data
   },
 
-  // Eliminar una planta
+  // Delete plant
   delete: async (id: string): Promise<void> => {
     await api.delete(`/plants/${id}`)
   },
