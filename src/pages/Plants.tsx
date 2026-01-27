@@ -84,11 +84,11 @@ export function Plants() {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Leaf className="h-8 w-8 text-green-600" />
-          <h1 className="text-3xl font-bold">Gestionar Plantas</h1>
+          <h1 className="text-3xl font-bold">Plantas</h1>
         </div>
         <Button onClick={handleCreate}>
           <Plus className="mr-2 h-4 w-4" />
-          Nueva Planta
+          Agregar Planta
         </Button>
       </div>
 
