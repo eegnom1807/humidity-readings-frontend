@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -12,24 +11,17 @@ import {
 } from "@/components/ui/dialog"
 import type { Sensor, SensorRequest } from "@/types/sensor"
 import type { Plant } from "@/types/plant"
-import plantService from "@/services/plantService"
 
 interface SensorFormProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   sensor?: Sensor | null
   onSubmit?: (data: SensorRequest, edit: boolean) => void
+  plants: Plant[]
 }
 
-export function SensorForm({ open, onOpenChange, sensor, onSubmit }: SensorFormProps) {
+export function SensorForm({ open, onOpenChange, sensor, onSubmit, plants }: SensorFormProps) {
   const isEditing = !!sensor
-  const [plants, setPlants] = useState<Plant[]>([])
-
-  useEffect(() => {
-    if (open) {
-      plantService.getAll().then(setPlants)
-    }
-  }, [open])
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()

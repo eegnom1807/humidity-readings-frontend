@@ -31,14 +31,19 @@ export function Sensors() {
   const [plants, setPlants] = useState<Plant[]>([])
 
   useEffect(() => {
-    getAllSensors()
-    plantService.getAll().then(setPlants)
+    getAllSensors();
+    getAllPlants();
   }, [])
 
   const getAllSensors = async () => {
     const response = await sensorService.getAll()
     setSensors(response)
   }
+
+  const getAllPlants = async () => {
+    const response = await plantService.getAll();
+    setPlants(response);
+  };
 
   const getPlantName = (plantId: number): string => {
     const plant = plants.find((p) => Number(p.id) === plantId)
@@ -147,6 +152,7 @@ export function Sensors() {
         onOpenChange={setFormOpen}
         sensor={selectedSensor}
         onSubmit={handleFormSubmit}
+        plants={plants}
       />
 
       <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
