@@ -18,7 +18,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { PlantForm } from "@/components/PlantForm"
-import type { Plant, PlantRequest } from "@/types/plant"
+import type { Plant, PlantRequest, PlantRequestUpdate } from "@/types/plant"
 import plantService from "@/services/plantService"
 
 export function Plants() {
@@ -51,11 +51,22 @@ export function Plants() {
     setDeleteDialogOpen(true)
   }
 
-  const handleFormSubmit = async (data: PlantRequest, edit: boolean) => {
+  const handleFormSubmit = async (data: PlantRequest, edit: boolean, image?: File) => {
+    let plantId = data.id;
+
     if (!edit) {
-      await plantService.create(data);
+      const plant = await plantService.create(data);
+      plantId = plant.id;
     } else if (data.id) {
-      await plantService.update(data.id, data);
+      const new_data : PlantRequestUpdate = {
+        name: data.name,
+        image_url: data.image_url
+      }
+      await plantService.update(data.id, new_data);
+    }
+
+    if (image && plantId) {
+      await plantService.uploadImage(String(plantId), image);
     }
 
     setFormOpen(false);
@@ -69,6 +80,10 @@ export function Plants() {
     setDeleteDialogOpen(false)
     setSelectedPlant(null)
     getAllPlants();
+  }
+
+  const isActive = (active: boolean): string => {
+    return (active) ? "Si" : "No";
   }
 
   return (
@@ -90,7 +105,7 @@ export function Plants() {
             <TableRow>
               <TableHead className="w-20">Imagen</TableHead>
               <TableHead>Nombre</TableHead>
-              <TableHead>Especie</TableHead>
+              <TableHead>Activa</TableHead>
               <TableHead>Fecha de modificación</TableHead>
               <TableHead className="w-25">Acciones</TableHead>
             </TableRow>
@@ -100,14 +115,14 @@ export function Plants() {
               <TableRow key={plant.id}>
                 <TableCell>
                   <img
-                    src="https://placehold.co/400"
+                    src={plantService.getImage(plant.image_url)}
                     alt={plant.name}
                     className="h-12 w-12 rounded-md object-cover"
                   />
                 </TableCell>
                 <TableCell className="font-medium">{plant.name}</TableCell>
-                <TableCell className="font-medium">{plant.species}</TableCell>
-                <TableCell>{plant.updated_at}</TableCell>
+                <TableCell className="font-medium">{isActive(plant.active)}</TableCell>
+                <TableCell className="font-medium">{plant.updated_at}</TableCell>
                 <TableCell>
                   <div className="flex gap-2">
                     <Button

@@ -1,5 +1,5 @@
 import api from "./api"
-import type { Plant, PlantRequest } from "@/types/plant"
+import type { Plant, PlantRequest, PlantResponse, PlantsResponse } from "@/types/plant"
 
 export interface WaterPlantDto {
   plantId: string
@@ -10,23 +10,20 @@ export interface SetAutoWaterDto {
   enabled: boolean
 }
 
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost";
+const API_PORT = import.meta.env.VITE_API_PORT || "3000";
+
 export const plantService = {
   // Get all plants
   getAll: async (): Promise<Plant[]> => {
-    const response = await api.get<Plant[]>("/plants");
-    return response.data;
+    const response = await api.get<PlantsResponse>("/plants");
+    return response.data.data;
   },
-
-  // Get plant by id
-  // getById: async (id: string): Promise<Plant> => {
-  //   const response = await api.get<Plant>(`/plants/${id}`)
-  //   return response.data
-  // },
 
   // Create plant
   create: async (data: PlantRequest): Promise<Plant> => {
-    const response = await api.post<Plant>("/plants", data)
-    return response.data
+    const response = await api.post<PlantResponse>("/plants", data)
+    return response.data.data
   },
 
   // Update plant
@@ -49,6 +46,19 @@ export const plantService = {
   setAutoWater: async (id: string, enabled: boolean): Promise<void> => {
     await api.post(`/plants/${id}/auto-water`, { enabled })
   },
+
+  // Subir imagen de planta
+  uploadImage: async (id: string, file: File): Promise<void> => {
+    const formData = new FormData()
+    formData.append("image_url", file)
+    await api.post(`/plants/${id}/image`, formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    })
+  },
+
+  getImage: (image_url: string): string => {
+    return (image_url !== "") ? API_URL + ":" + API_PORT + image_url : "https://placehold.co/400";
+  } 
 }
 
 export default plantService

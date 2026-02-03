@@ -15,7 +15,7 @@ interface PlantFormProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   plant?: Plant | null
-  onSubmit?: (data: PlantRequest, edit: boolean) => void
+  onSubmit?: (data: PlantRequest, edit: boolean, image?: File) => void
 }
 
 export function PlantForm({ open, onOpenChange, plant, onSubmit }: PlantFormProps) {
@@ -26,12 +26,13 @@ export function PlantForm({ open, onOpenChange, plant, onSubmit }: PlantFormProp
     const formData = new FormData(e.currentTarget)
     const data: PlantRequest = {
       name: formData.get("name") as string,
-      species: formData.get("species") as string,
+      image_url: "",
     }
     if (isEditing && plant) {
       data.id = plant.id
     }
-    onSubmit?.(data, isEditing)
+    const imageFile = formData.get("image_url") as File | null
+    onSubmit?.(data, isEditing, imageFile && imageFile.size > 0 ? imageFile : undefined)
   }
 
   return (
@@ -59,12 +60,12 @@ export function PlantForm({ open, onOpenChange, plant, onSubmit }: PlantFormProp
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="species">Especie</Label>
+              <Label htmlFor="image_url">Imagen</Label>
               <Input
-                id="species"
-                name="species"
-                placeholder="Tomate"
-                defaultValue={plant?.species ?? ""}
+                id="image_url"
+                name="image_url"
+                type="file"
+                accept="image/png, image/jpeg"
               />
             </div>
           </div>
