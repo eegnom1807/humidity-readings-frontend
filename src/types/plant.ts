@@ -17,8 +17,21 @@ export interface PlantRequestUpdate {
   image_url: string;
 }
 
+export interface DashboardPlant {
+  id: number;
+  name: string;
+  image_url: string;
+  active: boolean;
+  humidity: number | null;
+  last_reading: string;
+}
+
 export interface PlantsResponse {
   data: Plant[];
+}
+
+export interface DashboardPlantsResponse {
+  data: DashboardPlant[];
 }
 
 export interface PlantResponse {

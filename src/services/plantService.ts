@@ -1,5 +1,5 @@
 import api from "./api"
-import type { Plant, PlantRequest, PlantResponse, PlantsResponse } from "@/types/plant"
+import type { Plant, PlantRequest, PlantResponse, PlantsResponse, DashboardPlant, DashboardPlantsResponse } from "@/types/plant"
 
 export interface WaterPlantDto {
   plantId: string
@@ -14,6 +14,12 @@ const API_URL = import.meta.env.VITE_API_URL || "http://localhost";
 const API_PORT = import.meta.env.VITE_API_PORT || "3000";
 
 export const plantService = {
+  // Get dashboard data
+  getDashboard: async (): Promise<DashboardPlant[]> => {
+    const response = await api.get<DashboardPlantsResponse>("/plants/dashboard");
+    return response.data.data;
+  },
+
   // Get all plants
   getAll: async (): Promise<Plant[]> => {
     const response = await api.get<PlantsResponse>("/plants");
@@ -40,11 +46,6 @@ export const plantService = {
   // Regar una planta
   water: async (id: string): Promise<void> => {
     await api.post(`/plants/${id}/water`)
-  },
-
-  // Activar/desactivar riego automatico
-  setAutoWater: async (id: string, enabled: boolean): Promise<void> => {
-    await api.post(`/plants/${id}/auto-water`, { enabled })
   },
 
   // Subir imagen de planta
