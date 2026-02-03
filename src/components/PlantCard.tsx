@@ -1,62 +1,50 @@
-import { useState } from "react"
-import { Droplets, CalendarDays } from "lucide-react"
+import { Droplets, CalendarDays, Circle } from "lucide-react"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Switch } from "@/components/ui/switch"
-import { Label } from "@/components/ui/label"
-import type { Plant } from "@/types/plant"
+import type { DashboardPlant } from "@/types/plant"
+import plantService from "@/services/plantService"
 
 interface PlantCardProps {
-  plant: Plant
-  onWater?: (plantId: string) => void
-  onAutoWaterChange?: (plantId: string, enabled: boolean) => void
+  plant: DashboardPlant
+  onWater?: (plantId: number) => void
 }
 
-export function PlantCard({ plant, onWater, onAutoWaterChange }: PlantCardProps) {
-  const [autoWater, setAutoWater] = useState(false)
-
-  const handleAutoWaterChange = (checked: boolean) => {
-    setAutoWater(checked)
-    onAutoWaterChange?.(plant.id, checked)
-  }
+export function PlantCard({ plant, onWater }: PlantCardProps) {
+  const hasReadings = plant.humidity != null && plant.last_reading !== ""
 
   return (
-    <Card className="overflow-hidden">
+    <Card className={`overflow-hidden${!hasReadings ? " opacity-50 pointer-events-none" : ""}`}>
       <div className="aspect-square w-full overflow-hidden">
         <img
-          src={plant.imageUrl}
+          src={plantService.getImage(plant.image_url)}
           alt={plant.name}
           className="h-full w-full object-cover transition-transform hover:scale-105"
         />
       </div>
       <CardHeader className="pb-2">
-        <CardTitle className="text-lg">{plant.name}</CardTitle>
+        <div className="flex items-center justify-between">
+          <CardTitle className="text-lg">{plant.name}</CardTitle>
+          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+            <Circle className={`h-2.5 w-2.5 fill-current ${plant.active ? "text-green-500" : "text-red-500"}`} />
+            <span>{plant.active ? "Activa" : "Inactiva"}</span>
+          </div>
+        </div>
       </CardHeader>
       <CardContent className="space-y-3">
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <Droplets className="h-4 w-4 text-blue-500" />
-          <span>Humedad: {plant.humidity}%</span>
+          <span>Humedad: {plant.humidity != null ? `${plant.humidity}%` : "Sin datos"}</span>
         </div>
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <CalendarDays className="h-4 w-4" />
-          <span>Última lectura: {plant.lastReadingDate}</span>
-        </div>
-        <div className="flex items-center justify-between">
-          <Label htmlFor={`auto-water-${plant.id}`} className="text-sm">
-            Riego automático
-          </Label>
-          <Switch
-            id={`auto-water-${plant.id}`}
-            checked={autoWater}
-            onCheckedChange={handleAutoWaterChange}
-          />
+          <span>Última lectura: {plant.last_reading || "Sin lectura"}</span>
         </div>
       </CardContent>
       <CardFooter>
         <Button
           className="w-full"
+          disabled={!hasReadings}
           onClick={() => onWater?.(plant.id)}
-          disabled={autoWater}
         >
           <Droplets className="mr-2 h-4 w-4" />
           Regar Planta
