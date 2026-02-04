@@ -6,7 +6,7 @@ import plantService from "@/services/plantService"
 
 interface PlantCardProps {
   plant: DashboardPlant
-  onWater?: (plantId: number) => void
+  onWater?: (pin: string) => void
 }
 
 export function PlantCard({ plant, onWater }: PlantCardProps) {
@@ -44,7 +44,7 @@ export function PlantCard({ plant, onWater }: PlantCardProps) {
         <Button
           className="w-full"
           disabled={!hasReadings}
-          onClick={() => onWater?.(plant.id)}
+          onClick={() => onWater?.(plant.pin)}
         >
           <Droplets className="mr-2 h-4 w-4" />
           Regar Planta

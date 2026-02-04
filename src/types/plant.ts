@@ -23,6 +23,7 @@ export interface DashboardPlant {
   image_url: string;
   active: boolean;
   humidity: number | null;
+  pin: string;
   last_reading: string;
 }
 
