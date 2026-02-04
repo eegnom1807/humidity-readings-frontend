@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react"
 import { NavLink, Outlet, useLocation } from "react-router-dom"
-import { LayoutDashboard, Leaf, ChevronDown, Cpu } from "lucide-react"
+import { LayoutDashboard, Leaf, ChevronDown, Cpu, Settings } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 export function Layout() {
@@ -55,6 +55,7 @@ export function Layout() {
                     : "text-muted-foreground"
                 )}
               >
+                <Settings className="h-4 w-4" />
                 Administrar
                 <ChevronDown className={cn("h-4 w-4 transition-transform", adminOpen && "rotate-180")} />
               </button>
