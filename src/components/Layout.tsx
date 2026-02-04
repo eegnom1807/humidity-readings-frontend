@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react"
 import { NavLink, Outlet, useLocation } from "react-router-dom"
-import { LayoutDashboard, Leaf, ChevronDown, Cpu } from "lucide-react"
+import { LayoutDashboard, Leaf, ChevronDown, Cpu, Settings } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 export function Layout() {
@@ -26,7 +26,7 @@ export function Layout() {
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-2">
             <Leaf className="h-6 w-6 text-green-600" />
-            <span className="text-xl font-bold">PlantMonitor</span>
+            <span className="text-xl font-bold">Monitor de plantas</span>
           </div>
           <nav className="flex items-center gap-1">
             <NavLink
@@ -42,7 +42,7 @@ export function Layout() {
               }
             >
               <LayoutDashboard className="h-4 w-4" />
-              Dashboard
+              Panel
             </NavLink>
 
             <div className="relative" ref={dropdownRef}>
@@ -55,6 +55,7 @@ export function Layout() {
                     : "text-muted-foreground"
                 )}
               >
+                <Settings className="h-4 w-4" />
                 Administrar
                 <ChevronDown className={cn("h-4 w-4 transition-transform", adminOpen && "rotate-180")} />
               </button>
