@@ -95,7 +95,7 @@ export function Plants() {
         </div>
         <Button className="cursor-pointer" onClick={handleCreate}>
           <Plus className="mr-2 h-4 w-4" />
-          Agregar Planta
+          Agregar
         </Button>
       </div>
 
