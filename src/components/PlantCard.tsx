@@ -37,7 +37,7 @@ export function PlantCard({ plant, onWater }: PlantCardProps) {
         </div>
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <CalendarDays className="h-4 w-4" />
-          <span>Última lectura: {plant.last_reading || "Sin lectura"}</span>
+          <span>Lectura: {plant.last_reading || "Sin lectura"}</span>
         </div>
       </CardContent>
       <CardFooter>

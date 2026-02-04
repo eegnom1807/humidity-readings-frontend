@@ -26,7 +26,7 @@ export function Layout() {
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-2">
             <Leaf className="h-6 w-6 text-green-600" />
-            <span className="text-xl font-bold">PlantMonitor</span>
+            <span className="text-xl font-bold">Monitor de plantas</span>
           </div>
           <nav className="flex items-center gap-1">
             <NavLink
@@ -42,7 +42,7 @@ export function Layout() {
               }
             >
               <LayoutDashboard className="h-4 w-4" />
-              Dashboard
+              Panel
             </NavLink>
 
             <div className="relative" ref={dropdownRef}>
