@@ -23,13 +23,14 @@ export function Dashboard() {
     }
   }
 
-  const handleWater = async (plantId: number) => {
-    try {
-      await plantService.water(String(plantId))
-      loadDashboard()
-    } catch (error) {
-      console.error("Error al regar planta:", error)
-    }
+  const handleWater = (pin: string) => {
+    console.log("make http request to arduino! ", pin);
+    // try {
+    //   await plantService.water(String(plantId))
+    //   loadDashboard()
+    // } catch (error) {
+    //   console.error("Error al regar planta:", error)
+    // }
   }
 
   if (loading) {
