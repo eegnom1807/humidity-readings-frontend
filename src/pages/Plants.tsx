@@ -66,7 +66,9 @@ export function Plants() {
     }
 
     if (image && plantId) {
-      await plantService.uploadImage(String(plantId), image);
+      const formData = new FormData()
+      formData.append("image_url", image);
+      await plantService.uploadImage(String(plantId), formData);
     }
 
     setFormOpen(false);
