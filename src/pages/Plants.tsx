@@ -19,7 +19,9 @@ import {
 } from "@/components/ui/dialog"
 import { PlantForm } from "@/components/PlantForm"
 import type { Plant, PlantRequest, PlantRequestUpdate } from "@/types/plant"
-import plantService from "@/services/plantService"
+import plantService from "@/services/plantService";
+import { AxiosError } from "axios";
+import { toastMessage } from "@/lib/utils"
 
 export function Plants() {
   const [formOpen, setFormOpen] = useState(false)
@@ -52,33 +54,49 @@ export function Plants() {
   }
 
   const handleFormSubmit = async (data: PlantRequest, edit: boolean, image?: File) => {
-    let plantId = data.id;
+    try {
+      let plantId = data.id;
 
-    if (!edit) {
-      const plant = await plantService.create(data);
-      plantId = plant.id;
-    } else if (data.id) {
-      const new_data : PlantRequestUpdate = {
-        name: data.name,
-        image_url: data.image_url
+      if (!edit) {
+        const plant = await plantService.create(data);
+        plantId = plant.id;
+        toastMessage("Plant created", "success");
+      } else if (data.id) {
+        const new_data: PlantRequestUpdate = {
+          name: data.name,
+          image_url: data.image_url
+        }
+        await plantService.update(data.id, new_data);
+        toastMessage("Plant updated", "success");
       }
-      await plantService.update(data.id, new_data);
-    }
 
-    if (image && plantId) {
-      const formData = new FormData()
-      formData.append("image_url", image);
-      await plantService.uploadImage(String(plantId), formData);
-    }
+      if (image && plantId) {
+        const formData = new FormData()
+        formData.append("image_url", image);
+        await plantService.uploadImage(String(plantId), formData);
+      }
 
-    setFormOpen(false);
-    getAllPlants();
+      setFormOpen(false);
+      getAllPlants();
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        const errorMessage = error.response?.data?.message ?? {};
+        if (typeof errorMessage == 'string')
+          toastMessage(errorMessage || "Error al crear la planta", "error");
+
+        const { name: [nameError] = [] } = errorMessage;
+        const errors = [nameError].filter(e => typeof e === "string");
+        if (errors.length > 0)
+          toastMessage(errors.join(" · "), "error");
+      }
+    }
   }
 
   const handleConfirmDelete = async () => {
     if (selectedPlant?.id)
-      await plantService.delete(selectedPlant?.id)
+      await plantService.delete(selectedPlant?.id);
 
+    toastMessage("Plant deleted", "success");
     setDeleteDialogOpen(false)
     setSelectedPlant(null)
     getAllPlants();
