@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react"
 import { NavLink, Outlet, useLocation } from "react-router-dom"
 import { LayoutDashboard, Leaf, ChevronDown, Cpu, Settings } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { Toaster } from 'sonner';
 
 export function Layout() {
   const [adminOpen, setAdminOpen] = useState(false)
@@ -99,6 +100,7 @@ export function Layout() {
         </div>
       </header>
       <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+        <Toaster richColors position="top-right" expand={true} />
         <Outlet />
       </main>
     </div>

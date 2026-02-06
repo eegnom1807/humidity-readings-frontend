@@ -1,14 +1,13 @@
 import api from "./api"
-import type { Plant, PlantRequest, PlantResponse, PlantsResponse, DashboardPlant, DashboardPlantsResponse } from "@/types/plant"
-
-export interface WaterPlantDto {
-  plantId: string
-}
-
-export interface SetAutoWaterDto {
-  plantId: string
-  enabled: boolean
-}
+import type { 
+  Plant, 
+  PlantRequest, 
+  PlantResponse, 
+  PlantsResponse, 
+  DashboardPlant, 
+  DashboardPlantsResponse, 
+  PlantRequestUpdate 
+} from "@/types/plant"
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost";
 const API_PORT = import.meta.env.VITE_API_PORT || "3000";
@@ -33,7 +32,7 @@ export const plantService = {
   },
 
   // Update plant
-  update: async (id: string, data: PlantRequest): Promise<Plant> => {
+  update: async (id: string, data: PlantRequestUpdate): Promise<Plant> => {
     const response = await api.put<Plant>(`/plants/${id}`, data)
     return response.data
   },
@@ -48,10 +47,8 @@ export const plantService = {
     await api.post(`/plants/${id}/water`)
   },
 
-  // Subir imagen de planta
-  uploadImage: async (id: string, file: File): Promise<void> => {
-    const formData = new FormData()
-    formData.append("image_url", file)
+  // upload image plant
+  uploadImage: async (id: string, formData: FormData): Promise<void> => {
     await api.post(`/plants/${id}/image`, formData, {
       headers: { "Content-Type": "multipart/form-data" },
     })

@@ -10,6 +10,12 @@ export function Dashboard() {
 
   useEffect(() => {
     loadDashboard()
+
+    const interval = setInterval(() => {
+      loadDashboard()
+    }, 10000)
+
+    return () => clearInterval(interval)
   }, [])
 
   const loadDashboard = async () => {
