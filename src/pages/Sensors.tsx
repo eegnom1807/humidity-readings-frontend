@@ -32,11 +32,6 @@ export function Sensors() {
   const [sensors, setSensors] = useState<Sensor[]>([])
   const [plants, setPlants] = useState<Plant[]>([])
 
-  useEffect(() => {
-    getAllSensors();
-    getAllPlants();
-  }, [])
-
   const getAllSensors = async () => {
     const response = await sensorService.getAll()
     setSensors(response)
@@ -46,6 +41,11 @@ export function Sensors() {
     const response = await plantService.getAll();
     setPlants(response);
   };
+
+  useEffect(() => {
+    getAllSensors();
+    getAllPlants();
+  }, [])
 
   const getPlantName = (plantId: number): string => {
     const plant = plants.find((p) => Number(p.id) === plantId)
