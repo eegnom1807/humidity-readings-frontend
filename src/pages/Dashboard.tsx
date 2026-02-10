@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { Leaf } from "lucide-react"
 import { PlantCard } from "@/components/PlantCard"
 import type { DashboardPlant } from "@/types/plant"
@@ -8,17 +8,7 @@ export function Dashboard() {
   const [plants, setPlants] = useState<DashboardPlant[]>([])
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    loadDashboard()
-
-    const interval = setInterval(() => {
-      loadDashboard()
-    }, 10000)
-
-    return () => clearInterval(interval)
-  }, [])
-
-  const loadDashboard = async () => {
+  const loadDashboard = useCallback(async () => {
     try {
       const data = await plantService.getDashboard()
       setPlants(data)
@@ -27,7 +17,21 @@ export function Dashboard() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [])
+
+  useEffect(() => {
+    loadDashboard()
+  }, [loadDashboard])
+
+  useEffect(() => {
+    if (plants.length === 0) return
+
+    const interval = setInterval(() => {
+      loadDashboard()
+    }, 10000)
+
+    return () => clearInterval(interval)
+  }, [plants.length, loadDashboard])
 
   const handleWater = (pin: string) => {
     console.log("make http request to arduino! ", pin);
