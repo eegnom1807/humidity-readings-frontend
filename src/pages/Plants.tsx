@@ -29,14 +29,14 @@ export function Plants() {
   const [selectedPlant, setSelectedPlant] = useState<Plant | null>(null)
   const [plants, setPlants] = useState<Plant[]>([]);
 
-  useEffect(() => {
-    getAllPlants();
-  }, [])
-
   const getAllPlants = async () => {
     const response = await plantService.getAll();
     setPlants(response)
   }
+
+  useEffect(() => {
+    getAllPlants();
+  }, [])
 
   const handleCreate = () => {
     setSelectedPlant(null)
