@@ -12,7 +12,8 @@ export function Dashboard() {
   const loadDashboard = useCallback(async () => {
     try {
       const data = await plantService.getDashboard()
-      setPlants(data)
+      setPlants(data);
+      setError('');
     } catch (error) {
       if (error instanceof Error) {
         const errorMsg = `Error al cargar el dashboard: ${error.message}`;

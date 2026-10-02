@@ -33,7 +33,8 @@ export function Plants() {
   const getAllPlants = async () => {
     try {
       const response = await plantService.getAll();
-      setPlants(response)
+      setPlants(response);
+      setError('');
     } catch (error) {
       if (error instanceof Error) {
         const errorMsg = `Error al cargar las plantas: ${error.message}`;

@@ -31,24 +31,35 @@ export function Sensors() {
   const [selectedSensor, setSelectedSensor] = useState<Sensor | null>(null)
   const [sensors, setSensors] = useState<Sensor[]>([])
   const [plants, setPlants] = useState<Plant[]>([])
-  const [error, setError] = useState('');
+  const [errorPlants, setErrorPlants] = useState('');
+  const [errorSensors, setErrorSensors] = useState('');
 
   const getAllSensors = async () => {
     try {
       const response = await sensorService.getAll()
-      setSensors(response)
+      setSensors(response);
+      setErrorSensors('');
     } catch (error) {
       if (error instanceof Error) {
         const errorMsg = `Error al cargar los sensores: ${error.message}`;
         console.error(errorMsg);
-        setError(errorMsg);
+        setErrorSensors(errorMsg);
       }
     }
   }
 
   const getAllPlants = async () => {
-    const response = await plantService.getAll();
-    setPlants(response);
+    try {
+      const response = await plantService.getAll();
+      setPlants(response);
+      setErrorPlants('');
+    } catch (error) {
+      if (error instanceof Error) {
+        const errorMsg = `Error al cargar las platas: ${error.message}`;
+        console.error(errorMsg);
+        setErrorPlants(errorMsg);
+      }
+    }
   };
 
   useEffect(() => {
@@ -170,13 +181,18 @@ export function Sensors() {
                 </TableCell>
               </TableRow>
             )}
-            {error && (
-              <TableRow>
-                <TableCell colSpan={5} className="h-24 text-center text-red-600">
-                  {error}
+            <TableRow>
+              {(errorSensors && errorSensors) && (
+                <TableCell colSpan={4} className="h-24 text-center">
+                  {errorSensors && (
+                    <div className="text-red-500">{errorSensors}</div>
+                  )}
+                  {errorPlants && (
+                    <div className="text-red-500">{errorPlants}</div>
+                  )}
                 </TableCell>
-              </TableRow>
-            )}
+              )}
+            </TableRow>
           </TableBody>
         </Table>
       </div>
