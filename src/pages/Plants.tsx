@@ -28,10 +28,19 @@ export function Plants() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [selectedPlant, setSelectedPlant] = useState<Plant | null>(null)
   const [plants, setPlants] = useState<Plant[]>([]);
+  const [error, setError] = useState('');
 
   const getAllPlants = async () => {
-    const response = await plantService.getAll();
-    setPlants(response)
+    try {
+      const response = await plantService.getAll();
+      setPlants(response)
+    } catch (error) {
+      if (error instanceof Error) {
+        const errorMsg = `Error al cargar las plantas: ${error.message}`;
+        console.error(errorMsg);
+        setError(errorMsg);
+      }
+    }
   }
 
   useEffect(() => {
@@ -169,6 +178,13 @@ export function Plants() {
               <TableRow>
                 <TableCell colSpan={5} className="h-24 text-center">
                   No hay plantas registradas.
+                </TableCell>
+              </TableRow>
+            )}
+            {error && (
+              <TableRow>
+                <TableCell colSpan={5} className="h-24 text-center text-red-600">
+                  {error}
                 </TableCell>
               </TableRow>
             )}
