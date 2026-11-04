@@ -31,15 +31,35 @@ export function Sensors() {
   const [selectedSensor, setSelectedSensor] = useState<Sensor | null>(null)
   const [sensors, setSensors] = useState<Sensor[]>([])
   const [plants, setPlants] = useState<Plant[]>([])
+  const [errorPlants, setErrorPlants] = useState('');
+  const [errorSensors, setErrorSensors] = useState('');
 
   const getAllSensors = async () => {
-    const response = await sensorService.getAll()
-    setSensors(response)
+    try {
+      const response = await sensorService.getAll()
+      setSensors(response);
+      setErrorSensors('');
+    } catch (error) {
+      if (error instanceof Error) {
+        const errorMsg = `Error al cargar los sensores: ${error.message}`;
+        console.error(errorMsg);
+        setErrorSensors(errorMsg);
+      }
+    }
   }
 
   const getAllPlants = async () => {
-    const response = await plantService.getAll();
-    setPlants(response);
+    try {
+      const response = await plantService.getAll();
+      setPlants(response);
+      setErrorPlants('');
+    } catch (error) {
+      if (error instanceof Error) {
+        const errorMsg = `Error al cargar las platas: ${error.message}`;
+        console.error(errorMsg);
+        setErrorPlants(errorMsg);
+      }
+    }
   };
 
   useEffect(() => {
@@ -161,6 +181,18 @@ export function Sensors() {
                 </TableCell>
               </TableRow>
             )}
+            <TableRow>
+              {(errorSensors && errorSensors) && (
+                <TableCell colSpan={4} className="h-24 text-center">
+                  {errorSensors && (
+                    <div className="text-red-500">{errorSensors}</div>
+                  )}
+                  {errorPlants && (
+                    <div className="text-red-500">{errorPlants}</div>
+                  )}
+                </TableCell>
+              )}
+            </TableRow>
           </TableBody>
         </Table>
       </div>
