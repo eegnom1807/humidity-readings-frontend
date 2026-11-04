@@ -7,13 +7,20 @@ import plantService from "@/services/plantService"
 export function Dashboard() {
   const [plants, setPlants] = useState<DashboardPlant[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('');
 
   const loadDashboard = useCallback(async () => {
     try {
       const data = await plantService.getDashboard()
-      setPlants(data)
+      setPlants(data);
+      setError('');
     } catch (error) {
-      console.error("Error al cargar el dashboard:", error)
+      if (error instanceof Error) {
+        const errorMsg = `Error al cargar el dashboard: ${error.message}`;
+        console.error(errorMsg);
+        setError(errorMsg);
+      }
+
     } finally {
       setLoading(false)
     }
@@ -73,9 +80,15 @@ export function Dashboard() {
         <div className="flex flex-col items-center justify-center py-12 text-center">
           <Leaf className="h-16 w-16 text-muted-foreground/50" />
           <h3 className="mt-4 text-lg font-semibold">No hay plantas</h3>
-          <p className="text-muted-foreground">
-            Agrega tu primera planta para comenzar a monitorear su humedad.
-          </p>
+          {error === '' ? (
+            <p className="text-muted-foreground">
+              Agrega tu primera planta para comenzar a monitorear su humedad.
+            </p>
+          ) : (
+            <p className="text-red-500">
+              {error}
+            </p>
+          )}
         </div>
       )}
     </div>
