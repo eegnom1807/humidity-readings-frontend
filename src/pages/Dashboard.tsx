@@ -9,21 +9,20 @@ export function Dashboard() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('');
 
-  const loadDashboard = useCallback(async () => {
-    try {
-      const data = await plantService.getDashboard()
-      setPlants(data);
-      setError('');
-    } catch (error) {
-      if (error instanceof Error) {
-        const errorMsg = `Error al cargar el dashboard: ${error.message}`;
-        console.error(errorMsg);
-        setError(errorMsg);
-      }
-
-    } finally {
-      setLoading(false)
-    }
+  const loadDashboard = useCallback(() => {
+    return plantService.getDashboard()
+      .then((data) => {
+        setPlants(data);
+        setError('');
+      })
+      .catch((error) => {
+        if (error instanceof Error) {
+          const errorMsg = `Error al cargar el dashboard: ${error.message}`;
+          console.error(errorMsg);
+          setError(errorMsg);
+        }
+      })
+      .finally(() => setLoading(false))
   }, [])
 
   useEffect(() => {

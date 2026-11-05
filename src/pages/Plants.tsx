@@ -30,18 +30,19 @@ export function Plants() {
   const [plants, setPlants] = useState<Plant[]>([]);
   const [error, setError] = useState('');
 
-  const getAllPlants = async () => {
-    try {
-      const response = await plantService.getAll();
-      setPlants(response);
-      setError('');
-    } catch (error) {
-      if (error instanceof Error) {
-        const errorMsg = `Error al cargar las plantas: ${error.message}`;
-        console.error(errorMsg);
-        setError(errorMsg);
-      }
-    }
+  const getAllPlants = () => {
+    return plantService.getAll()
+      .then((response) => {
+        setPlants(response);
+        setError('');
+      })
+      .catch((error) => {
+        if (error instanceof Error) {
+          const errorMsg = `Error al cargar las plantas: ${error.message}`;
+          console.error(errorMsg);
+          setError(errorMsg);
+        }
+      })
   }
 
   useEffect(() => {

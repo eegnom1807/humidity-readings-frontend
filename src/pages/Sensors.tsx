@@ -34,32 +34,34 @@ export function Sensors() {
   const [errorPlants, setErrorPlants] = useState('');
   const [errorSensors, setErrorSensors] = useState('');
 
-  const getAllSensors = async () => {
-    try {
-      const response = await sensorService.getAll()
-      setSensors(response);
-      setErrorSensors('');
-    } catch (error) {
-      if (error instanceof Error) {
-        const errorMsg = `Error al cargar los sensores: ${error.message}`;
-        console.error(errorMsg);
-        setErrorSensors(errorMsg);
-      }
-    }
+  const getAllSensors = () => {
+    return sensorService.getAll()
+      .then((response) => {
+        setSensors(response);
+        setErrorSensors('');
+      })
+      .catch((error) => {
+        if (error instanceof Error) {
+          const errorMsg = `Error al cargar los sensores: ${error.message}`;
+          console.error(errorMsg);
+          setErrorSensors(errorMsg);
+        }
+      })
   }
 
-  const getAllPlants = async () => {
-    try {
-      const response = await plantService.getAll();
-      setPlants(response);
-      setErrorPlants('');
-    } catch (error) {
-      if (error instanceof Error) {
-        const errorMsg = `Error al cargar las platas: ${error.message}`;
-        console.error(errorMsg);
-        setErrorPlants(errorMsg);
-      }
-    }
+  const getAllPlants = () => {
+    return plantService.getAll()
+      .then((response) => {
+        setPlants(response);
+        setErrorPlants('');
+      })
+      .catch((error) => {
+        if (error instanceof Error) {
+          const errorMsg = `Error al cargar las platas: ${error.message}`;
+          console.error(errorMsg);
+          setErrorPlants(errorMsg);
+        }
+      })
   };
 
   useEffect(() => {
