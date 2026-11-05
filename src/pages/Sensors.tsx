@@ -181,8 +181,8 @@ export function Sensors() {
                 </TableCell>
               </TableRow>
             )}
-            <TableRow>
-              {(errorSensors && errorSensors) && (
+            {(errorSensors && errorSensors) && (
+              <TableRow>
                 <TableCell colSpan={4} className="h-24 text-center">
                   {errorSensors && (
                     <div className="text-red-500">{errorSensors}</div>
@@ -191,8 +191,8 @@ export function Sensors() {
                     <div className="text-red-500">{errorPlants}</div>
                   )}
                 </TableCell>
-              )}
-            </TableRow>
+              </TableRow>
+            )}
           </TableBody>
         </Table>
       </div>
