@@ -52,7 +52,7 @@ export const plantService = {
   },
 
   getImage: (image_url: string): string => {
-    return (image_url !== "") ? API_ORIGIN + image_url : "https://placehold.co/400";
+    return (image_url !== "") ? API_ORIGIN + image_url : "/plant-placeholder.svg";
   } 
 }
 
