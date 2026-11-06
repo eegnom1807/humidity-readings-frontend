@@ -9,21 +9,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog"
+import { ConfirmDialog } from "@/components/ConfirmDialog"
 import { SensorForm } from "@/components/SensorForm"
 import type { Sensor, SensorRequest } from "@/types/sensor"
 import type { Plant } from "@/types/plant"
 import sensorService from "@/services/sensorService"
 import plantService from "@/services/plantService";
-import { AxiosError } from "axios";
-import { toastMessage } from "@/lib/utils"
+import { getApiErrorMessage, toastMessage } from "@/lib/utils"
 
 export function Sensors() {
   const [formOpen, setFormOpen] = useState(false)
@@ -34,32 +26,34 @@ export function Sensors() {
   const [errorPlants, setErrorPlants] = useState('');
   const [errorSensors, setErrorSensors] = useState('');
 
-  const getAllSensors = async () => {
-    try {
-      const response = await sensorService.getAll()
-      setSensors(response);
-      setErrorSensors('');
-    } catch (error) {
-      if (error instanceof Error) {
-        const errorMsg = `Error al cargar los sensores: ${error.message}`;
-        console.error(errorMsg);
-        setErrorSensors(errorMsg);
-      }
-    }
+  const getAllSensors = () => {
+    return sensorService.getAll()
+      .then((response) => {
+        setSensors(response);
+        setErrorSensors('');
+      })
+      .catch((error) => {
+        if (error instanceof Error) {
+          const errorMsg = `Error al cargar los sensores: ${error.message}`;
+          console.error(errorMsg);
+          setErrorSensors(errorMsg);
+        }
+      })
   }
 
-  const getAllPlants = async () => {
-    try {
-      const response = await plantService.getAll();
-      setPlants(response);
-      setErrorPlants('');
-    } catch (error) {
-      if (error instanceof Error) {
-        const errorMsg = `Error al cargar las platas: ${error.message}`;
-        console.error(errorMsg);
-        setErrorPlants(errorMsg);
-      }
-    }
+  const getAllPlants = () => {
+    return plantService.getAll()
+      .then((response) => {
+        setPlants(response);
+        setErrorPlants('');
+      })
+      .catch((error) => {
+        if (error instanceof Error) {
+          const errorMsg = `Error al cargar las plantas: ${error.message}`;
+          console.error(errorMsg);
+          setErrorPlants(errorMsg);
+        }
+      })
   };
 
   useEffect(() => {
@@ -91,36 +85,33 @@ export function Sensors() {
     try {
       if (!edit) {
         await sensorService.create(data)
-        toastMessage("Sensor created", "success");
+        toastMessage("Sensor creado", "success");
       } else if (selectedSensor) {
         await sensorService.update(selectedSensor.id, data)
-        toastMessage("Sensor updated", "success");
+        toastMessage("Sensor actualizado", "success");
       }
 
       setFormOpen(false)
       getAllSensors()
     } catch (error) {
-      if (error instanceof AxiosError) {
-        const errorMessage = error.response?.data?.message ?? {};
-        if (typeof errorMessage == 'string')
-          toastMessage(errorMessage || "Error al crear el sensor", "error");
-
-        const { pin: [pinError] = [], plant_id: [plantIdError] = [] } = errorMessage;
-        const errors = [pinError, plantIdError].filter(e => typeof e === "string");
-        if (errors.length > 0)
-          toastMessage(errors.join(" · "), "error");
-      }
+      const fallback = edit ? "Error al actualizar el sensor" : "Error al crear el sensor";
+      toastMessage(getApiErrorMessage(error, fallback), "error");
     }
   }
 
   const handleConfirmDelete = async () => {
-    if (selectedSensor)
-      await sensorService.delete(selectedSensor.id)
+    if (!selectedSensor) return;
 
-    toastMessage("Sensor deleted", "success");
+    try {
+      await sensorService.delete(selectedSensor.id)
+      toastMessage("Sensor eliminado", "success");
+      getAllSensors()
+    } catch (error) {
+      toastMessage(getApiErrorMessage(error, "Error al eliminar el sensor"), "error");
+    }
+
     setDeleteDialogOpen(false)
     setSelectedSensor(null)
-    getAllSensors()
   }
 
   return (
@@ -130,7 +121,7 @@ export function Sensors() {
           <Cpu className="h-8 w-8 text-green-600" />
           <h1 className="text-3xl font-bold">Sensores</h1>
         </div>
-        <Button className="cursor-pointer" onClick={handleCreate}>
+        <Button onClick={handleCreate}>
           <Plus className="mr-2 h-4 w-4" />
           Agregar
         </Button>
@@ -155,7 +146,6 @@ export function Sensors() {
                 <TableCell>
                   <div className="flex gap-2">
                     <Button
-                      className="cursor-pointer"
                       variant="ghost"
                       size="icon"
                       onClick={() => handleEdit(sensor)}
@@ -163,7 +153,6 @@ export function Sensors() {
                       <Pencil className="h-4 w-4" />
                     </Button>
                     <Button
-                      className="cursor-pointer"
                       variant="ghost"
                       size="icon"
                       onClick={() => handleDelete(sensor)}
@@ -181,7 +170,7 @@ export function Sensors() {
                 </TableCell>
               </TableRow>
             )}
-            {(errorSensors && errorSensors) && (
+            {(errorSensors || errorPlants) && (
               <TableRow>
                 <TableCell colSpan={4} className="h-24 text-center">
                   {errorSensors && (
@@ -205,24 +194,13 @@ export function Sensors() {
         plants={plants}
       />
 
-      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Eliminar Sensor</DialogTitle>
-            <DialogDescription>
-              Estas seguro de que deseas eliminar el sensor "{selectedSensor?.pin}"?
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button className="cursor-pointer" variant="outline" onClick={() => setDeleteDialogOpen(false)}>
-              Cancelar
-            </Button>
-            <Button className="cursor-pointer" onClick={handleConfirmDelete}>
-              Eliminar
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <ConfirmDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        title="Eliminar Sensor"
+        description={`¿Estás seguro de que deseas eliminar el sensor "${selectedSensor?.pin ?? ""}"?`}
+        onConfirm={handleConfirmDelete}
+      />
     </div>
   )
 }
