@@ -22,8 +22,7 @@ import type { Sensor, SensorRequest } from "@/types/sensor"
 import type { Plant } from "@/types/plant"
 import sensorService from "@/services/sensorService"
 import plantService from "@/services/plantService";
-import { AxiosError } from "axios";
-import { toastMessage } from "@/lib/utils"
+import { getApiErrorMessage, toastMessage } from "@/lib/utils"
 
 export function Sensors() {
   const [formOpen, setFormOpen] = useState(false)
@@ -102,27 +101,24 @@ export function Sensors() {
       setFormOpen(false)
       getAllSensors()
     } catch (error) {
-      if (error instanceof AxiosError) {
-        const errorMessage = error.response?.data?.message ?? {};
-        if (typeof errorMessage == 'string')
-          toastMessage(errorMessage || "Error al crear el sensor", "error");
-
-        const { pin: [pinError] = [], plant_id: [plantIdError] = [] } = errorMessage;
-        const errors = [pinError, plantIdError].filter(e => typeof e === "string");
-        if (errors.length > 0)
-          toastMessage(errors.join(" · "), "error");
-      }
+      const fallback = edit ? "Error al actualizar el sensor" : "Error al crear el sensor";
+      toastMessage(getApiErrorMessage(error, fallback), "error");
     }
   }
 
   const handleConfirmDelete = async () => {
-    if (selectedSensor)
-      await sensorService.delete(selectedSensor.id)
+    if (!selectedSensor) return;
 
-    toastMessage("Sensor deleted", "success");
+    try {
+      await sensorService.delete(selectedSensor.id)
+      toastMessage("Sensor deleted", "success");
+      getAllSensors()
+    } catch (error) {
+      toastMessage(getApiErrorMessage(error, "Error al eliminar el sensor"), "error");
+    }
+
     setDeleteDialogOpen(false)
     setSelectedSensor(null)
-    getAllSensors()
   }
 
   return (
@@ -183,7 +179,7 @@ export function Sensors() {
                 </TableCell>
               </TableRow>
             )}
-            {(errorSensors && errorSensors) && (
+            {(errorSensors || errorPlants) && (
               <TableRow>
                 <TableCell colSpan={4} className="h-24 text-center">
                   {errorSensors && (

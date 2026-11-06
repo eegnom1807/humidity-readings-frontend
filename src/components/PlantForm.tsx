@@ -1,3 +1,4 @@
+import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -15,13 +16,14 @@ interface PlantFormProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   plant?: Plant | null
-  onSubmit?: (data: PlantRequest, edit: boolean, image?: File) => void
+  onSubmit?: (data: PlantRequest, edit: boolean, image?: File) => Promise<void>
 }
 
 export function PlantForm({ open, onOpenChange, plant, onSubmit }: PlantFormProps) {
   const isEditing = !!plant
+  const [submitting, setSubmitting] = useState(false)
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault()
     const formData = new FormData(e.currentTarget)
     const data: PlantRequest = {
@@ -32,7 +34,13 @@ export function PlantForm({ open, onOpenChange, plant, onSubmit }: PlantFormProp
       data.id = plant.id
     }
     const imageFile = formData.get("image_url") as File | null
-    onSubmit?.(data, isEditing, imageFile && imageFile.size > 0 ? imageFile : undefined)
+
+    setSubmitting(true)
+    try {
+      await onSubmit?.(data, isEditing, imageFile && imageFile.size > 0 ? imageFile : undefined)
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   return (
@@ -57,6 +65,7 @@ export function PlantForm({ open, onOpenChange, plant, onSubmit }: PlantFormProp
                 name="name"
                 placeholder="Ej: Planta de tomate"
                 defaultValue={plant?.name ?? ""}
+                required
               />
             </div>
             <div className="grid gap-2">
@@ -73,7 +82,7 @@ export function PlantForm({ open, onOpenChange, plant, onSubmit }: PlantFormProp
             <Button className="cursor-pointer" type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Cancelar
             </Button>
-            <Button className="cursor-pointer" type="submit">
+            <Button className="cursor-pointer" type="submit" disabled={submitting}>
               {isEditing ? "Guardar Cambios" : "Crear Planta"}
             </Button>
           </DialogFooter>

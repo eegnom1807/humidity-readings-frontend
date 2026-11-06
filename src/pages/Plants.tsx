@@ -20,8 +20,7 @@ import {
 import { PlantForm } from "@/components/PlantForm"
 import type { Plant, PlantRequest, PlantRequestUpdate } from "@/types/plant"
 import plantService from "@/services/plantService";
-import { AxiosError } from "axios";
-import { toastMessage } from "@/lib/utils"
+import { getApiErrorMessage, toastMessage } from "@/lib/utils"
 
 export function Plants() {
   const [formOpen, setFormOpen] = useState(false)
@@ -65,9 +64,9 @@ export function Plants() {
   }
 
   const handleFormSubmit = async (data: PlantRequest, edit: boolean, image?: File) => {
-    try {
-      let plantId = data.id;
+    let plantId = data.id;
 
+    try {
       if (!edit) {
         const plant = await plantService.create(data);
         plantId = plant.id;
@@ -80,37 +79,40 @@ export function Plants() {
         await plantService.update(data.id, new_data);
         toastMessage("Plant updated", "success");
       }
+    } catch (error) {
+      const fallback = edit ? "Error al actualizar la planta" : "Error al crear la planta";
+      toastMessage(getApiErrorMessage(error, fallback), "error");
+      return;
+    }
 
-      if (image && plantId) {
+    if (image && plantId) {
+      try {
         const formData = new FormData()
         formData.append("image_url", image);
         await plantService.uploadImage(String(plantId), formData);
-      }
-
-      setFormOpen(false);
-      getAllPlants();
-    } catch (error) {
-      if (error instanceof AxiosError) {
-        const errorMessage = error.response?.data?.message ?? {};
-        if (typeof errorMessage == 'string')
-          toastMessage(errorMessage || "Error al crear la planta", "error");
-
-        const { name: [nameError] = [] } = errorMessage;
-        const errors = [nameError].filter(e => typeof e === "string");
-        if (errors.length > 0)
-          toastMessage(errors.join(" · "), "error");
+      } catch (error) {
+        const reason = getApiErrorMessage(error, "Error al subir la imagen");
+        toastMessage(`La planta se guardó, pero falta la imagen: ${reason}`, "error");
       }
     }
+
+    setFormOpen(false);
+    getAllPlants();
   }
 
   const handleConfirmDelete = async () => {
-    if (selectedPlant?.id)
-      await plantService.delete(selectedPlant?.id);
+    if (!selectedPlant) return;
 
-    toastMessage("Plant deleted", "success");
+    try {
+      await plantService.delete(selectedPlant.id);
+      toastMessage("Plant deleted", "success");
+      getAllPlants();
+    } catch (error) {
+      toastMessage(getApiErrorMessage(error, "Error al eliminar la planta"), "error");
+    }
+
     setDeleteDialogOpen(false)
     setSelectedPlant(null)
-    getAllPlants();
   }
 
   const isActive = (active: boolean): string => {
