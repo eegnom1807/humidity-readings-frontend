@@ -53,7 +53,7 @@ export function PlantForm({ open, onOpenChange, plant, onSubmit }: PlantFormProp
           <DialogDescription>
             {isEditing
               ? "Modifica los datos de tu planta."
-              : "Agrega una nueva planta a tu coleccion."}
+              : "Agrega una nueva planta a tu colección."}
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit}>

@@ -63,14 +63,14 @@ export function Plants() {
       if (!edit) {
         const plant = await plantService.create(data);
         plantId = plant.id;
-        toastMessage("Plant created", "success");
+        toastMessage("Planta creada", "success");
       } else if (data.id) {
         const new_data: PlantRequestUpdate = {
           name: data.name,
           image_url: data.image_url
         }
         await plantService.update(data.id, new_data);
-        toastMessage("Plant updated", "success");
+        toastMessage("Planta actualizada", "success");
       }
     } catch (error) {
       const fallback = edit ? "Error al actualizar la planta" : "Error al crear la planta";
@@ -98,7 +98,7 @@ export function Plants() {
 
     try {
       await plantService.delete(selectedPlant.id);
-      toastMessage("Plant deleted", "success");
+      toastMessage("Planta eliminada", "success");
       getAllPlants();
     } catch (error) {
       toastMessage(getApiErrorMessage(error, "Error al eliminar la planta"), "error");
@@ -109,7 +109,7 @@ export function Plants() {
   }
 
   const isActive = (active: boolean): string => {
-    return (active) ? "Si" : "No";
+    return (active) ? "Sí" : "No";
   }
 
   return (
@@ -198,7 +198,7 @@ export function Plants() {
         open={deleteDialogOpen}
         onOpenChange={setDeleteDialogOpen}
         title="Eliminar Planta"
-        description={`Estas seguro de que deseas eliminar "${selectedPlant?.name ?? ""}"?`}
+        description={`¿Estás seguro de que deseas eliminar "${selectedPlant?.name ?? ""}"?`}
         onConfirm={handleConfirmDelete}
       />
     </div>

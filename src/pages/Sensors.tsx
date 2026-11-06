@@ -49,7 +49,7 @@ export function Sensors() {
       })
       .catch((error) => {
         if (error instanceof Error) {
-          const errorMsg = `Error al cargar las platas: ${error.message}`;
+          const errorMsg = `Error al cargar las plantas: ${error.message}`;
           console.error(errorMsg);
           setErrorPlants(errorMsg);
         }
@@ -85,10 +85,10 @@ export function Sensors() {
     try {
       if (!edit) {
         await sensorService.create(data)
-        toastMessage("Sensor created", "success");
+        toastMessage("Sensor creado", "success");
       } else if (selectedSensor) {
         await sensorService.update(selectedSensor.id, data)
-        toastMessage("Sensor updated", "success");
+        toastMessage("Sensor actualizado", "success");
       }
 
       setFormOpen(false)
@@ -104,7 +104,7 @@ export function Sensors() {
 
     try {
       await sensorService.delete(selectedSensor.id)
-      toastMessage("Sensor deleted", "success");
+      toastMessage("Sensor eliminado", "success");
       getAllSensors()
     } catch (error) {
       toastMessage(getApiErrorMessage(error, "Error al eliminar el sensor"), "error");
@@ -198,7 +198,7 @@ export function Sensors() {
         open={deleteDialogOpen}
         onOpenChange={setDeleteDialogOpen}
         title="Eliminar Sensor"
-        description={`Estas seguro de que deseas eliminar el sensor "${selectedSensor?.pin ?? ""}"?`}
+        description={`¿Estás seguro de que deseas eliminar el sensor "${selectedSensor?.pin ?? ""}"?`}
         onConfirm={handleConfirmDelete}
       />
     </div>
