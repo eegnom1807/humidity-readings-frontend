@@ -4,10 +4,10 @@ const API_URL = import.meta.env.VITE_API_URL || "http://localhost"
 const API_PORT = import.meta.env.VITE_API_PORT || "3000"
 const API_BASE_PATH = import.meta.env.VITE_API_BASE_PATH || "/api/v1"
 
-const baseURL = `${API_URL}:${API_PORT}${API_BASE_PATH}`
+export const API_ORIGIN = `${API_URL}:${API_PORT}`
 
 export const api = axios.create({
-  baseURL,
+  baseURL: `${API_ORIGIN}${API_BASE_PATH}`,
   headers: {
     "Content-Type": "application/json",
   },

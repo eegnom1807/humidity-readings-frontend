@@ -9,36 +9,31 @@ export function Dashboard() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('');
 
-  const loadDashboard = useCallback(async () => {
-    try {
-      const data = await plantService.getDashboard()
-      setPlants(data);
-      setError('');
-    } catch (error) {
-      if (error instanceof Error) {
-        const errorMsg = `Error al cargar el dashboard: ${error.message}`;
-        console.error(errorMsg);
-        setError(errorMsg);
-      }
-
-    } finally {
-      setLoading(false)
-    }
+  const loadDashboard = useCallback(() => {
+    return plantService.getDashboard()
+      .then((data) => {
+        setPlants(data);
+        setError('');
+      })
+      .catch((error) => {
+        if (error instanceof Error) {
+          const errorMsg = `Error al cargar el dashboard: ${error.message}`;
+          console.error(errorMsg);
+          setError(errorMsg);
+        }
+      })
+      .finally(() => setLoading(false))
   }, [])
 
   useEffect(() => {
     loadDashboard()
-  }, [loadDashboard])
-
-  useEffect(() => {
-    if (plants.length === 0) return
 
     const interval = setInterval(() => {
       loadDashboard()
     }, 10000)
 
     return () => clearInterval(interval)
-  }, [plants.length, loadDashboard])
+  }, [loadDashboard])
 
   const handleWater = (pin: string) => {
     console.log("make http request to arduino! ", pin);
@@ -64,6 +59,12 @@ export function Dashboard() {
         <Leaf className="h-8 w-8 text-green-600" />
         <h1 className="text-3xl font-bold">Estado de Plantas</h1>
       </div>
+
+      {error && plants.length > 0 && (
+        <p className="rounded-md border border-destructive/50 px-4 py-3 text-sm text-destructive">
+          {error}. Los datos pueden estar desactualizados.
+        </p>
+      )}
 
       <div className="flex flex-wrap justify-center gap-6">
         {plants.map((plant) => (

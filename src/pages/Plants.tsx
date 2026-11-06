@@ -9,19 +9,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog"
+import { ConfirmDialog } from "@/components/ConfirmDialog"
 import { PlantForm } from "@/components/PlantForm"
 import type { Plant, PlantRequest, PlantRequestUpdate } from "@/types/plant"
 import plantService from "@/services/plantService";
-import { AxiosError } from "axios";
-import { toastMessage } from "@/lib/utils"
+import { getApiErrorMessage, toastMessage } from "@/lib/utils"
 
 export function Plants() {
   const [formOpen, setFormOpen] = useState(false)
@@ -30,18 +22,19 @@ export function Plants() {
   const [plants, setPlants] = useState<Plant[]>([]);
   const [error, setError] = useState('');
 
-  const getAllPlants = async () => {
-    try {
-      const response = await plantService.getAll();
-      setPlants(response);
-      setError('');
-    } catch (error) {
-      if (error instanceof Error) {
-        const errorMsg = `Error al cargar las plantas: ${error.message}`;
-        console.error(errorMsg);
-        setError(errorMsg);
-      }
-    }
+  const getAllPlants = () => {
+    return plantService.getAll()
+      .then((response) => {
+        setPlants(response);
+        setError('');
+      })
+      .catch((error) => {
+        if (error instanceof Error) {
+          const errorMsg = `Error al cargar las plantas: ${error.message}`;
+          console.error(errorMsg);
+          setError(errorMsg);
+        }
+      })
   }
 
   useEffect(() => {
@@ -64,56 +57,59 @@ export function Plants() {
   }
 
   const handleFormSubmit = async (data: PlantRequest, edit: boolean, image?: File) => {
-    try {
-      let plantId = data.id;
+    let plantId = data.id;
 
+    try {
       if (!edit) {
         const plant = await plantService.create(data);
         plantId = plant.id;
-        toastMessage("Plant created", "success");
+        toastMessage("Planta creada", "success");
       } else if (data.id) {
         const new_data: PlantRequestUpdate = {
           name: data.name,
           image_url: data.image_url
         }
         await plantService.update(data.id, new_data);
-        toastMessage("Plant updated", "success");
+        toastMessage("Planta actualizada", "success");
       }
+    } catch (error) {
+      const fallback = edit ? "Error al actualizar la planta" : "Error al crear la planta";
+      toastMessage(getApiErrorMessage(error, fallback), "error");
+      return;
+    }
 
-      if (image && plantId) {
+    if (image && plantId) {
+      try {
         const formData = new FormData()
         formData.append("image_url", image);
         await plantService.uploadImage(String(plantId), formData);
-      }
-
-      setFormOpen(false);
-      getAllPlants();
-    } catch (error) {
-      if (error instanceof AxiosError) {
-        const errorMessage = error.response?.data?.message ?? {};
-        if (typeof errorMessage == 'string')
-          toastMessage(errorMessage || "Error al crear la planta", "error");
-
-        const { name: [nameError] = [] } = errorMessage;
-        const errors = [nameError].filter(e => typeof e === "string");
-        if (errors.length > 0)
-          toastMessage(errors.join(" · "), "error");
+      } catch (error) {
+        const reason = getApiErrorMessage(error, "Error al subir la imagen");
+        toastMessage(`La planta se guardó, pero falta la imagen: ${reason}`, "error");
       }
     }
-  }
 
-  const handleConfirmDelete = async () => {
-    if (selectedPlant?.id)
-      await plantService.delete(selectedPlant?.id);
-
-    toastMessage("Plant deleted", "success");
-    setDeleteDialogOpen(false)
-    setSelectedPlant(null)
+    setFormOpen(false);
     getAllPlants();
   }
 
+  const handleConfirmDelete = async () => {
+    if (!selectedPlant) return;
+
+    try {
+      await plantService.delete(selectedPlant.id);
+      toastMessage("Planta eliminada", "success");
+      getAllPlants();
+    } catch (error) {
+      toastMessage(getApiErrorMessage(error, "Error al eliminar la planta"), "error");
+    }
+
+    setDeleteDialogOpen(false)
+    setSelectedPlant(null)
+  }
+
   const isActive = (active: boolean): string => {
-    return (active) ? "Si" : "No";
+    return (active) ? "Sí" : "No";
   }
 
   return (
@@ -123,7 +119,7 @@ export function Plants() {
           <Leaf className="h-8 w-8 text-green-600" />
           <h1 className="text-3xl font-bold">Plantas</h1>
         </div>
-        <Button className="cursor-pointer" onClick={handleCreate}>
+        <Button onClick={handleCreate}>
           <Plus className="mr-2 h-4 w-4" />
           Agregar
         </Button>
@@ -156,7 +152,6 @@ export function Plants() {
                 <TableCell>
                   <div className="flex gap-2">
                     <Button
-                      className="cursor-pointer"
                       variant="ghost"
                       size="icon"
                       onClick={() => handleEdit(plant)}
@@ -164,7 +159,6 @@ export function Plants() {
                       <Pencil className="h-4 w-4" />
                     </Button>
                     <Button
-                      className="cursor-pointer"
                       variant="ghost"
                       size="icon"
                       onClick={() => handleDelete(plant)}
@@ -200,24 +194,13 @@ export function Plants() {
         onSubmit={handleFormSubmit}
       />
 
-      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Eliminar Planta</DialogTitle>
-            <DialogDescription>
-              Estas seguro de que deseas eliminar "{selectedPlant?.name}"?
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button className="cursor-pointer" variant="outline" onClick={() => setDeleteDialogOpen(false)}>
-              Cancelar
-            </Button>
-            <Button className="cursor-pointer" onClick={handleConfirmDelete}>
-              Eliminar
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <ConfirmDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        title="Eliminar Planta"
+        description={`¿Estás seguro de que deseas eliminar "${selectedPlant?.name ?? ""}"?`}
+        onConfirm={handleConfirmDelete}
+      />
     </div>
   )
 }

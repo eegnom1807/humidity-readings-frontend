@@ -1,3 +1,4 @@
+import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -16,21 +17,28 @@ interface SensorFormProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   sensor?: Sensor | null
-  onSubmit?: (data: SensorRequest, edit: boolean) => void
+  onSubmit?: (data: SensorRequest, edit: boolean) => Promise<void>
   plants: Plant[]
 }
 
 export function SensorForm({ open, onOpenChange, sensor, onSubmit, plants }: SensorFormProps) {
   const isEditing = !!sensor
+  const [submitting, setSubmitting] = useState(false)
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault()
     const formData = new FormData(e.currentTarget)
     const data: SensorRequest = {
       pin: formData.get("pin") as string,
       plant_id: Number(formData.get("plant_id")),
     }
-    onSubmit?.(data, isEditing)
+
+    setSubmitting(true)
+    try {
+      await onSubmit?.(data, isEditing)
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   return (
@@ -55,6 +63,7 @@ export function SensorForm({ open, onOpenChange, sensor, onSubmit, plants }: Sen
                 name="pin"
                 placeholder="Ej: A0"
                 defaultValue={sensor?.pin ?? ""}
+                required
               />
             </div>
             <div className="grid gap-2">
@@ -63,6 +72,7 @@ export function SensorForm({ open, onOpenChange, sensor, onSubmit, plants }: Sen
                 id="plant_id"
                 name="plant_id"
                 defaultValue={sensor?.plant_id ?? ""}
+                required
                 className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
               >
                 <option value="">Seleccionar planta</option>
@@ -75,10 +85,10 @@ export function SensorForm({ open, onOpenChange, sensor, onSubmit, plants }: Sen
             </div>
           </div>
           <DialogFooter>
-            <Button className="cursor-pointer" type="button" variant="outline" onClick={() => onOpenChange(false)}>
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Cancelar
             </Button>
-            <Button className="cursor-pointer" type="submit">
+            <Button type="submit" disabled={submitting}>
               {isEditing ? "Guardar Cambios" : "Crear Sensor"}
             </Button>
           </DialogFooter>
