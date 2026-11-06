@@ -79,10 +79,10 @@ export function PlantForm({ open, onOpenChange, plant, onSubmit }: PlantFormProp
             </div>
           </div>
           <DialogFooter>
-            <Button className="cursor-pointer" type="button" variant="outline" onClick={() => onOpenChange(false)}>
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Cancelar
             </Button>
-            <Button className="cursor-pointer" type="submit" disabled={submitting}>
+            <Button type="submit" disabled={submitting}>
               {isEditing ? "Guardar Cambios" : "Crear Planta"}
             </Button>
           </DialogFooter>

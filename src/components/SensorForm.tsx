@@ -85,10 +85,10 @@ export function SensorForm({ open, onOpenChange, sensor, onSubmit, plants }: Sen
             </div>
           </div>
           <DialogFooter>
-            <Button className="cursor-pointer" type="button" variant="outline" onClick={() => onOpenChange(false)}>
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Cancelar
             </Button>
-            <Button className="cursor-pointer" type="submit" disabled={submitting}>
+            <Button type="submit" disabled={submitting}>
               {isEditing ? "Guardar Cambios" : "Crear Sensor"}
             </Button>
           </DialogFooter>

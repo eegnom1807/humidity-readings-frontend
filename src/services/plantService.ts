@@ -1,5 +1,5 @@
-import api from "./api"
-import type { 
+import api, { API_ORIGIN } from "./api"
+import type {
   Plant, 
   PlantRequest, 
   PlantResponse, 
@@ -8,9 +8,6 @@ import type {
   DashboardPlantsResponse, 
   PlantRequestUpdate 
 } from "@/types/plant"
-
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost";
-const API_PORT = import.meta.env.VITE_API_PORT || "3000";
 
 export const plantService = {
   // Get dashboard data
@@ -55,7 +52,7 @@ export const plantService = {
   },
 
   getImage: (image_url: string): string => {
-    return (image_url !== "") ? API_URL + ":" + API_PORT + image_url : "https://placehold.co/400";
+    return (image_url !== "") ? API_ORIGIN + image_url : "https://placehold.co/400";
   } 
 }
 

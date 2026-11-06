@@ -9,14 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog"
+import { ConfirmDialog } from "@/components/ConfirmDialog"
 import { SensorForm } from "@/components/SensorForm"
 import type { Sensor, SensorRequest } from "@/types/sensor"
 import type { Plant } from "@/types/plant"
@@ -128,7 +121,7 @@ export function Sensors() {
           <Cpu className="h-8 w-8 text-green-600" />
           <h1 className="text-3xl font-bold">Sensores</h1>
         </div>
-        <Button className="cursor-pointer" onClick={handleCreate}>
+        <Button onClick={handleCreate}>
           <Plus className="mr-2 h-4 w-4" />
           Agregar
         </Button>
@@ -153,7 +146,6 @@ export function Sensors() {
                 <TableCell>
                   <div className="flex gap-2">
                     <Button
-                      className="cursor-pointer"
                       variant="ghost"
                       size="icon"
                       onClick={() => handleEdit(sensor)}
@@ -161,7 +153,6 @@ export function Sensors() {
                       <Pencil className="h-4 w-4" />
                     </Button>
                     <Button
-                      className="cursor-pointer"
                       variant="ghost"
                       size="icon"
                       onClick={() => handleDelete(sensor)}
@@ -203,24 +194,13 @@ export function Sensors() {
         plants={plants}
       />
 
-      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Eliminar Sensor</DialogTitle>
-            <DialogDescription>
-              Estas seguro de que deseas eliminar el sensor "{selectedSensor?.pin}"?
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button className="cursor-pointer" variant="outline" onClick={() => setDeleteDialogOpen(false)}>
-              Cancelar
-            </Button>
-            <Button className="cursor-pointer" onClick={handleConfirmDelete}>
-              Eliminar
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <ConfirmDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        title="Eliminar Sensor"
+        description={`Estas seguro de que deseas eliminar el sensor "${selectedSensor?.pin ?? ""}"?`}
+        onConfirm={handleConfirmDelete}
+      />
     </div>
   )
 }

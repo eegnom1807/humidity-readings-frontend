@@ -9,14 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog"
+import { ConfirmDialog } from "@/components/ConfirmDialog"
 import { PlantForm } from "@/components/PlantForm"
 import type { Plant, PlantRequest, PlantRequestUpdate } from "@/types/plant"
 import plantService from "@/services/plantService";
@@ -126,7 +119,7 @@ export function Plants() {
           <Leaf className="h-8 w-8 text-green-600" />
           <h1 className="text-3xl font-bold">Plantas</h1>
         </div>
-        <Button className="cursor-pointer" onClick={handleCreate}>
+        <Button onClick={handleCreate}>
           <Plus className="mr-2 h-4 w-4" />
           Agregar
         </Button>
@@ -159,7 +152,6 @@ export function Plants() {
                 <TableCell>
                   <div className="flex gap-2">
                     <Button
-                      className="cursor-pointer"
                       variant="ghost"
                       size="icon"
                       onClick={() => handleEdit(plant)}
@@ -167,7 +159,6 @@ export function Plants() {
                       <Pencil className="h-4 w-4" />
                     </Button>
                     <Button
-                      className="cursor-pointer"
                       variant="ghost"
                       size="icon"
                       onClick={() => handleDelete(plant)}
@@ -203,24 +194,13 @@ export function Plants() {
         onSubmit={handleFormSubmit}
       />
 
-      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Eliminar Planta</DialogTitle>
-            <DialogDescription>
-              Estas seguro de que deseas eliminar "{selectedPlant?.name}"?
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button className="cursor-pointer" variant="outline" onClick={() => setDeleteDialogOpen(false)}>
-              Cancelar
-            </Button>
-            <Button className="cursor-pointer" onClick={handleConfirmDelete}>
-              Eliminar
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <ConfirmDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        title="Eliminar Planta"
+        description={`Estas seguro de que deseas eliminar "${selectedPlant?.name ?? ""}"?`}
+        onConfirm={handleConfirmDelete}
+      />
     </div>
   )
 }
